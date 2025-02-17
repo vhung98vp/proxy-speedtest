@@ -2,6 +2,7 @@ import os
 import re
 import random
 import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from .driver import get_driver
 from .proxy import get_proxy_list
 from .search import search_company
@@ -62,13 +63,19 @@ def test_all_proxies():
         file.write(json.dumps(result, indent=4) + "\n")
 
         proxy_list = get_proxy_list()
-        for i, proxy in enumerate(proxy_list):
-            port = proxy.get("proxy_port")
-            protocol, ip = re.match(r"(http|https)://([^/:]+)", os.getenv('PROXY_SERVER', '')).groups()
-            proxy_string = f"{protocol}://{ip}:{port}"
-            logger.info(f"Testing proxy #{i+1}: {proxy_string}...")
-            result = test_proxy(proxy_string, random.choice(companies))
-            results.append(result)
-            file.write(json.dumps(result, indent=4) + "\n")
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            futures = []
+            for i, proxy in enumerate(proxy_list):
+                port = proxy.get("proxy_port")
+                protocol, ip = re.match(r"(http|https)://([^/:]+)", os.getenv('PROXY_SERVER', '')).groups()
+                proxy_string = f"{protocol}://{ip}:{port}"
+                company_name = random.choice(companies)
+                logger.info(f"Submitting proxy #{i+1}: {proxy_string} for testing...")
+                futures.append(executor.submit(test_proxy, proxy_string, company_name))
+
+            for future in as_completed(futures):
+                result = future.result()
+                results.append(result)
+                file.write(json.dumps(result, indent=4) + "\n")
 
     return results

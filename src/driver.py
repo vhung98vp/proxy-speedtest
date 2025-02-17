@@ -116,15 +116,14 @@ def get_driver(proxy=None, open_gui=False):
     except Exception as e:
         logger.error(f"Error while getting IP address: {e}")
 
-    for handle in driver.window_handles[2:]:
-        driver.switch_to.window(handle)
-        time.sleep(1)
-        driver.close()
-
     # Load site and add history
     simulate_browsing(driver, random.randint(3, 5))
     # simulate_browsing(driver, random.randint(2, 4), True)
 
+    for handle in driver.window_handles[2:]:
+        driver.switch_to.window(handle)
+        time.sleep(1)
+        driver.close()
     driver.switch_to.window(driver.window_handles[1])
     
     logger.info(f"Chromedriver session {driver.session_id} has been created with UA {user_agent} and proxy {proxy}")
