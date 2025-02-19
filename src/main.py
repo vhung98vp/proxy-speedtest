@@ -13,17 +13,31 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def get_ip_address(driver):
+    try:
+        driver.get("https://api.ipify.org")  
+        ip_address = driver.find_element("tag name", "body").text
+        logger.info(f"Current IP address: {ip_address}")
+    except Exception as e:
+        logger.error(f"Error while getting IP address: {e}")
+        ip_address = "N/A"
+    return ip_address
+
+
 def test_proxy(proxy, company_name):
     driver = get_driver(proxy, True)
+    ip_address = get_ip_address(driver)
     speed_result = check_internet_speed(driver)
     first_url, search_time = search_company(driver, company_name)
     driver.quit()
 
-    logger.info(f"Proxy: {proxy} - Download: {speed_result['download_speed']} Mbps - Upload: {speed_result['upload_speed']} Mbps - Ping: {speed_result['ping']} ms")
+    logger.info(f"Proxy: {proxy} - IP: {ip_address}")
+    logger.info(f"Download: {speed_result['download_speed']} Mbps - Upload: {speed_result['upload_speed']} Mbps - Ping: {speed_result['ping']} ms")
     logger.info(f"Found URL: {first_url} - Search Time: {search_time:.6f} seconds")
 
     return {
         "proxy": proxy,
+        "ip": ip_address,
         "speed_result": speed_result,
         "company_name": company_name,
         "first_url": first_url,
