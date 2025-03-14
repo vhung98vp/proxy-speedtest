@@ -117,7 +117,7 @@ def get_driver(proxy=None, open_gui=False):
         logger.error(f"Error while getting IP address: {e}")
 
     # Load site and add history
-    simulate_browsing(driver, random.randint(3, 5))
+    simulate_browsing(driver, random.randint(5, 8))
     # simulate_browsing(driver, random.randint(2, 4), True)
 
     for handle in driver.window_handles[2:]:
