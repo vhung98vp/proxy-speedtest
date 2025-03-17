@@ -85,8 +85,8 @@ def get_driver(proxy=None, open_gui=False):
     options.add_argument("--enable-unsafe-swiftshader") 
 
     selected_extensions = random.sample(extension_files, random.randint(2, 4))
-    if 'uBlockOrigin.crx' in extension_files and 'uBlockOrigin.crx' not in selected_extensions:
-        selected_extensions.append('uBlockOrigin.crx')
+    if 'uBlockOriginLite.crx' in extension_files and 'uBlockOriginLite.crx' not in selected_extensions:
+        selected_extensions.append('uBlockOriginLite.crx')
     for extension_path in selected_extensions:
         options.add_extension(os.path.join(extensions_dir, extension_path))
         logger.info(f"Extension installed: {extension_path}")
